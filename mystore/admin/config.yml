@@ -1,0 +1,34 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "goods_store"
+    label: "商品数据库"
+    files:
+      - label: "商品列表"
+        name: "goods"
+        file: "goods.json"
+        fields:
+          - { label: "商品列表", name: "items", widget: "list", fields: [
+              { label: "唯一ID", name: "id", widget: "string" },
+              { label: "商品标题", name: "title", widget: "string" },
+              { label: "商品分类", name: "category", widget: "select", options: [
+                  { label: "数码电子", value: "digital" },
+                  { label: "车用外设", value: "auto" },
+                  { label: "生活家居", value: "life" }
+                ] 
+              },
+              { label: "现价 (元)", name: "price", widget: "number", value_type: "int" },
+              { label: "原价 (元)", name: "originalPrice", widget: "number", value_type: "int" },
+              { label: "成色说明 (如: 95新)", name: "condition", widget: "string" },
+              { label: "标记为已售出", name: "isSold", widget: "boolean", default: false },
+              { label: "商品主图", name: "image", widget: "image" },
+              { label: "详细描述", name: "description", widget: "text" },
+              { label: "闲鱼/担保链接", name: "xianyuUrl", widget: "string", required: false }
+            ]
+          }
+        ]

@@ -4,65 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>商品管理后台</title>
-  <!-- 引入 Netlify Identity 支持登录认证 -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- 引入 Decap CMS 核心库 -->
+  <!-- 引入 Decap CMS 后台核心脚本 -->
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-  <script>
-    // 配置 Decap CMS 后台界面结构
-    CMS.init({
-      config: {
-        backend: {
-          name: 'git-gateway',
-          branch: 'main', // 或者 'master'
-        },
-        media_folder: 'images', // 上传图片保存的目录
-        public_folder: '/images',
-        collections: [
-          {
-            name: 'goods_store',
-            label: '商品数据库',
-            files: [
-              {
-                label: '商品列表',
-                name: 'goods',
-                file: 'goods.json',
-                fields: [
-                  {
-                    label: '商品列表',
-                    name: 'items',
-                    widget: 'list',
-                    fields: [
-                      { label: '唯一ID', name: 'id', widget: 'string' },
-                      { label: '商品标题', name: 'title', widget: 'string' },
-                      { 
-                        label: '商品分类', 
-                        name: 'category', 
-                        widget: 'select', 
-                        options: [
-                          { label: '数码电子', value: 'digital' },
-                          { label: '车用外设', value: 'auto' },
-                          { label: '生活家居', value: 'life' }
-                        ] 
-                      },
-                      { label: '现价 (元)', name: 'price', widget: 'number', value_type: 'int' },
-                      { label: '原价 (元)', name: 'originalPrice', widget: 'number', value_type: 'int' },
-                      { label: '成色说明 (如: 95新)', name: 'condition', widget: 'string' },
-                      { label: '标记为已售出', name: 'isSold', widget: 'boolean', default: false },
-                      { label: '商品主图', name: 'image', widget: 'image' },
-                      { label: '详细描述', name: 'description', widget: 'text' },
-                      { label: '闲鱼/担保链接', name: 'xianyuUrl', widget: 'string', required: false }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    });
-  </script>
 </body>
 </html>
