@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人二手闲置市集 | Minimal Garage Sale</title>
+    <!-- 引入 Decap CMS 身份验证 SDK（用于登录后台） -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        :root {
+            --bg-color: #f6f8fa;
+            --card-bg: #ffffff;
+            --text-primary: #24292e;
+            --text-secondary: #586069;
+            --border-color: #e1e4e8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-primary); line-height: 1.5; padding: 20px; }
+        header { max-width: 1000px; margin: 20px auto 30px; text-align: center; }
+        header h1 { font-size: 2rem; margin-bottom: 8px; }
+        header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+        .categories { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .cat-btn { background: #fff; border: 1px solid var(--border-color); padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .cat-btn.active, .cat-btn:hover { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+
+        .goods-grid { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; cursor: pointer; }
+        .card:hover { transform: translateY(-4px); }
+        .card-img-wrapper { position: relative; width: 100%; padding-top: 75%; background: #eee; }
+        .card-img-wrapper img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .tag-sold { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; }
+        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; }
+        .card-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: baseline; }
+        .price { font-size: 1.2rem; font-weight: bold; color: #d9381e; }
+        .original-price { font-size: 0.8rem; color: var(--text-secondary); text-decoration: line-through; margin-left: 5px; }
+        .condition { font-size: 0.8rem; background: #f0f0f0; padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #fff; max-width: 500px; width: 100%; border-radius: 12px; padding: 24px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; border: none; background: none; }
+        .modal-actions { margin-top: 20px; display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center; text-decoration: none; display: inline-block; }
+        .btn-primary { background: var(--text-primary); color: #fff; }
+        .btn-secondary { background: #f0f2f5; color: var(--text-primary); }
+        footer { text-align: center; margin-top: 50px; color: var(--text-secondary); font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📦 个人闲置物品清仓</h1>
+        <p>个人一手使用，诚心处置，支持同城面交或快递发货。</p>
+    </header>
+
+    <div class="categories">
+        <button class="cat-btn active" onclick="filterCategory('all')">全部物品</button>
+        <button class="cat-btn" onclick="filterCategory('digital')">数码电子</button>
+        <button class="cat-btn" onclick="filterCategory('auto')">车用外设</button>
+        <button class="cat-btn" onclick="filterCategory('life')">生活家居</button>
+    </div>
+
+    <div class="goods-grid" id="goodsGrid"></div>
+
+    <div class="modal" id="goodsModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle" style="margin-bottom: 10px;"></h2>
+            <p id="modalPrice" class="price" style="margin-bottom: 15px;"></p>
+            <p id="modalDesc" style="color: var(--text-secondary); margin-bottom: 20px; white-space: pre-line;"></p>
+            <div class="modal-actions">
+                <a id="modalXianyu" href="#" target="_blank" class="btn btn-primary">去闲鱼/担保购买</a>
+                <button class="btn btn-secondary" onclick="alert('微信联系人：your_wechat_id\n请注明：购买闲置')">微信联系</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 个人二手闲置展示页 | <a href="/admin/" style="color: inherit;">管理后台</a></p>
+    </footer>
+
+    <script>
+        let goodsList = [];
+
+        // 从 goods.json 动态拉取数据
+        async function fetchGoods() {
+            try {
+                const response = await fetch('./goods.json');
+                const data = await response.json();
+                goodsList = data.items || [];
+                renderGoods(goodsList);
+            } catch (err) {
+                console.error("加载商品数据失败:", err);
+            }
+        }
+
+        function renderGoods(items) {
+            const grid = document.getElementById('goodsGrid');
+            grid.innerHTML = '';
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => openModal(item);
+
+                card.innerHTML = `
+                    <div class="card-img-wrapper">
+                        <img src="${item.image}" alt="${item.title}">
+                        ${item.isSold ? '<span class="tag-sold">已售出</span>' : ''}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${item.title}</div>
+                        <div class="card-desc">${item.description}</div>
+                        <div class="card-footer">
+                            <div>
+                                <span class="price">¥${item.price}</span>
+                                <span class="original-price">¥${item.originalPrice}</span>
+                            </div>
+                            <span class="condition">${item.condition}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(category) {
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (category === 'all') {
+                renderGoods(goodsList);
+            } else {
+                const filtered = goodsList.filter(item => item.category === category);
+                renderGoods(filtered);
+            }
+        }
+
+        function openModal(item) {
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalPrice').innerText = `¥ ${item.price} (原价 ¥${item.originalPrice})`;
+            document.getElementById('modalDesc').innerText = item.description;
+            
+            const xianyuBtn = document.getElementById('modalXianyu');
+            if(item.isSold) {
+                xianyuBtn.innerText = "商品已售出";
+                xianyuBtn.style.pointerEvents = "none";
+                xianyuBtn.style.background = "#ccc";
+            } else {
+                xianyuBtn.href = item.xianyuUrl || "#";
+                xianyuBtn.innerText = "去闲鱼/担保购买";
+                xianyuBtn.style.pointerEvents = "auto";
+                xianyuBtn.style.background = "var(--text-primary)";
+            }
+
+            document.getElementById('goodsModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('goodsModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('goodsModal');
+            if (event.target == modal) closeModal();
+        }
+
+        fetchGoods();
+
+        // Netlify Identity 登录逻辑监听
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

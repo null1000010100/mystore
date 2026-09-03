@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "1",
+      "title": "松下 AZ100 无线蓝牙耳机",
+      "category": "digital",
+      "price": 1200,
+      "originalPrice": 1800,
+      "condition": "95新",
+      "isSold": false,
+      "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&auto=format&fit=crop",
+      "description": "个人一手使用，功能全正常，音质表现极佳。\n箱说明书全，附送防摔保护壳。",
+      "xianyuUrl": "https://xianyu.com"
+    },
+    {
+      "id": "2",
+      "title": "雅途乐 (Yatour) 车用蓝牙模块",
+      "category": "auto",
+      "price": 150,
+      "originalPrice": 300,
+      "condition": "9新",
+      "isSold": false,
+      "image": "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=500&auto=format&fit=crop",
+      "description": "老款车型原厂音响无损升级蓝牙。\n接线简单，即插即用。",
+      "xianyuUrl": "https://xianyu.com"
+    }
+  ]
+}
